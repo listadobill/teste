@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CXTV - TV - ROKU TV - SAMSUNG TV - Pluto TV - IPTV</title>
+    <title> teste 1</title>
     <link href="https://vjs.zencdn.net/7.20.2/video-js.css" rel="stylesheet">
     <style>
         body {
@@ -188,7 +188,7 @@
     <script src="https://vjs.zencdn.net/7.20.2/video.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var listaURL = "https://raw.githubusercontent.com/listadobill/tv/main/cxtvrokusamsungplutotviptv.m3u";
+            var listaURL = "http://jmrk.xyz:8880/get.php?username=scott_olson@hotmail.com&password=2p7Ks4SPxP&type=m3u";
             var listaCanaisElemento = document.getElementById("lista-canais");
             var video = videojs('video-player', {
                 controls: true,
@@ -255,7 +255,7 @@
                             var logoImg = document.createElement("img");
 
                             // Se o logo estiver vazio, usa um ícone genérico
-                            logoImg.src = canal.logoURL ? canal.logoURL : 'http://jmrk.xyz:8880/get.php?username=scott_olson@hotmail.com&password=2p7Ks4SPxP&type=m3u';
+                            logoImg.src = canal.logoURL ? canal.logoURL : 'https://raw.githubusercontent.com/HelmerLuzo/PlutoTV_HL/4c9e648d2c2b070f43648ca5b231156f5858f019/tv/m3u/PlutoTV_tv_BR.m3u';
                             itemLista.appendChild(logoImg);
 
                             var nomeTexto = document.createElement("p");
