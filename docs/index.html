@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV  3</title>
+    <title>IPTV Player</title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <style>
         body {
@@ -52,48 +52,44 @@
             autoPlay: false,
         });
 
-        const url = "http://jmrk.xyz:8880/get.php?username=scott_olson@hotmail.com&password=2p7Ks4SPxP&type=m3u";
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const originalUrl = 'http://jmrk.xyz:8880/get.php?username=scott_olson@hotmail.com&password=2p7Ks4SPxP&type=m3u';
+        const proxyUrl = `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(originalUrl)}`;
 
-        fetch(proxyUrl)
+        function fetchWithTimeout(url, timeout = 7000) {
+            return Promise.race([
+                fetch(url),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+            ]);
+        }
+
+        fetchWithTimeout(proxyUrl)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Erro na requisição: ' + response.status);
+                    throw new Error('Network response was not ok');
                 }
-                return response.json();
+                return response.text();
             })
             .then(data => {
-                console.log('Resposta do proxy:', data); // Verifica a resposta do proxy
-                const m3uData = data.contents;
-                if (!m3uData) {
-                    console.error('Conteúdo M3U está vazio.');
-                    return;
-                }
-
-                var lines = m3uData.split('\n');
+                console.log('M3U Data:', data); // Log the M3U data for debugging
+                var lines = data.split('\n');
                 var channelList = document.getElementById('channel-list');
-                let hasChannels = false; // Flag para verificar se algum canal foi encontrado
-
                 lines.forEach((line, index) => {
                     if (line.startsWith('#EXTINF:')) {
-                        hasChannels = true; // Encontrou um canal
                         var channelName = line.split(',')[1].trim();
                         var channelUrl = lines[index + 1].trim();
+                        console.log('Channel Name:', channelName); // Log the channel name for debugging
+                        console.log('Channel URL:', channelUrl); // Log the channel URL for debugging
                         var listItem = document.createElement('li');
                         listItem.textContent = channelName;
                         listItem.setAttribute('data-url', channelUrl);
                         listItem.addEventListener('click', function() {
                             const url = this.getAttribute('data-url');
-                            console.log('Carregando URL do canal:', url); // Log da URL do canal
+                            console.log('Loading channel URL:', url); // Log the URL being loaded
                             player.load(url);
                         });
                         channelList.appendChild(listItem);
                     }
                 });
-
-                if (!hasChannels) {
-                    console.error('Nenhum canal encontrado na lista.');
-                }
             })
             .catch(error => console.error('Erro ao carregar a lista de canais:', error));
     </script>
