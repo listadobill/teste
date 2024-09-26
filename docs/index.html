@@ -53,7 +53,7 @@
         });
 
         const originalUrl = 'http://jmrk.xyz:8880/get.php?username=scott_olson@hotmail.com&password=2p7Ks4SPxP&type=m3u';
-        const proxyUrl = `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(originalUrl)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(originalUrl)}`;
 
         function fetchWithTimeout(url, timeout = 7000) {
             return Promise.race([
@@ -67,11 +67,12 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.text();
+                return response.json(); // Alterado para json, pois AllOrigins retorna um objeto JSON
             })
             .then(data => {
-                console.log('M3U Data:', data); // Log the M3U data for debugging
-                var lines = data.split('\n');
+                const m3uData = data.contents; // Acessa a propriedade 'contents'
+                console.log('M3U Data:', m3uData); // Log the M3U data for debugging
+                var lines = m3uData.split('\n');
                 var channelList = document.getElementById('channel-list');
                 lines.forEach((line, index) => {
                     if (line.startsWith('#EXTINF:')) {
