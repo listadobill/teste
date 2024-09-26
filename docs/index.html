@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player 2 </title>
+    <title>IPTV  3</title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <style>
         body {
@@ -56,15 +56,27 @@
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
         fetch(proxyUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Resposta do proxy:', data); // Verifica a resposta do proxy
                 const m3uData = data.contents;
+                if (!m3uData) {
+                    console.error('Conteúdo M3U está vazio.');
+                    return;
+                }
+
                 var lines = m3uData.split('\n');
                 var channelList = document.getElementById('channel-list');
+                let hasChannels = false; // Flag para verificar se algum canal foi encontrado
 
                 lines.forEach((line, index) => {
                     if (line.startsWith('#EXTINF:')) {
+                        hasChannels = true; // Encontrou um canal
                         var channelName = line.split(',')[1].trim();
                         var channelUrl = lines[index + 1].trim();
                         var listItem = document.createElement('li');
@@ -78,6 +90,10 @@
                         channelList.appendChild(listItem);
                     }
                 });
+
+                if (!hasChannels) {
+                    console.error('Nenhum canal encontrado na lista.');
+                }
             })
             .catch(error => console.error('Erro ao carregar a lista de canais:', error));
     </script>
