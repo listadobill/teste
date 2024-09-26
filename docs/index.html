@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player</title>
+    <title>IPTV Player 2 </title>
     <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <style>
         body {
@@ -58,9 +58,11 @@
         fetch(proxyUrl)
             .then(response => response.json())
             .then(data => {
+                console.log('Resposta do proxy:', data); // Verifica a resposta do proxy
                 const m3uData = data.contents;
                 var lines = m3uData.split('\n');
                 var channelList = document.getElementById('channel-list');
+
                 lines.forEach((line, index) => {
                     if (line.startsWith('#EXTINF:')) {
                         var channelName = line.split(',')[1].trim();
@@ -70,6 +72,7 @@
                         listItem.setAttribute('data-url', channelUrl);
                         listItem.addEventListener('click', function() {
                             const url = this.getAttribute('data-url');
+                            console.log('Carregando URL do canal:', url); // Log da URL do canal
                             player.load(url);
                         });
                         channelList.appendChild(listItem);
