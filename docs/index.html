@@ -3,16 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> teste 1</title>
-    <link rel="icon" href="docs/favicon.ico" type="image/x-icon"> <!-- Referência ao favicon -->
+    <title>Teste 1</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Referência ao favicon -->
     <link href="https://vjs.zencdn.net/7.20.2/video-js.css" rel="stylesheet">
     <style>
-        /* Estilos aqui */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        #header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            border-bottom: 1px solid #444;
+        }
+
+        #main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #player {
+            flex: 2;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .video-js {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+
+        #sidebar {
+            flex: 1;
+            background-color: rgba(34, 34, 34, 0.8);
+            overflow-y: auto;
+            padding: 10px;
+            border-left: 2px solid #444;
+        }
     </style>
 </head>
 <body>
     <div id="container">
-        <!-- Conteúdo aqui -->
+        <div id="header">
+            CXTV - TV - ROKU TV - SAMSUNG TV - Pluto TV - IPTV
+        </div>
+        <div id="main">
+            <div id="sidebar">
+                <h2>Lista de Canais</h2>
+                <ul id="lista-canais">
+                    <!-- Canais serão carregados dinamicamente -->
+                </ul>
+            </div>
+            <div id="player">
+                <video id="video-player" class="video-js vjs-default-skin" controls></video>
+            </div>
+        </div>
     </div>
+
+    <script src="https://vjs.zencdn.net/7.20.2/video.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var listaURL = "https://listadobill.github.io/teste/docs/proxy.php";
+            var listaCanaisElemento = document.getElementById("lista-canais");
+            var video = videojs('video-player', {
+                controls: true,
+                autoplay: false,
+                preload: 'auto'
+            });
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", listaURL, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var linhas = xhr.responseText.split('\n');
+                        var canais = [];
+
+                        for (var i = 0; i < linhas.length; i++) {
+                            if (linhas[i].startsWith('#EXTINF')) {
+                                var nome = linhas[i].split(',')[1];
+                                var link = linhas[i + 1] ? linhas[i + 1].trim() : null;
+
+                                if (!nome || !link) continue;
+
+                                canais.push({ nome: nome, link: link });
+                            }
+                        }
+
+                        canais.sort(function(a, b) {
+                            return a.nome.localeCompare(b.nome);
+                        });
+
+                        renderCanais(canais);
+                    } else {
+                        console.error("Erro ao carregar canais: " + xhr.status);
+                    }
+                }
+            };
+            xhr.send();
+
+            function renderCanais(canais) {
+                listaCanaisElemento.innerHTML = '';
+                canais.forEach(function(canal) {
+                    var itemLista = document.createElement("li");
+                    itemLista.textContent = canal.nome;
+                    itemLista.onclick = function() {
+                        video.src({ src: canal.link, type: 'application/x-mpegURL' });
+                        video.play();
+                    };
+                    listaCanaisElemento.appendChild(itemLista);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
